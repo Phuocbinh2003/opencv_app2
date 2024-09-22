@@ -32,8 +32,8 @@ def process_image(image):
     char_id = 1
     for contour in contours:
         x, y, w, h = cv.boundingRect(contour)
-        if h > 7 and w > 7 and h<100 and w<100:  # Điều chỉnh kích thước tối thiểu
-            cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 1)
+        if h > 7 and w > 7 and h < 100 and w < 100:  # Điều chỉnh kích thước tối thiểu
+            cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 1)  # Vẽ bounding box
             char_image = binary[y:y+h, x:x+w]  # Cắt từng ký tự
             characters.append(f"Ký tự {char_id}")  # Tạo tên cho ký tự
             char_images.append(char_image)  # Lưu ảnh ký tự
@@ -47,15 +47,19 @@ st.title("Ứng dụng Xử lý Hình ảnh")
 image_url = "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata96.jpg"
 image_response = requests.get(image_url)
 nparr = np.frombuffer(image_response.content, np.uint8)
-image = cv.imdecode(nparr, cv.IMREAD_COLOR)
+original_image = cv.imdecode(nparr, cv.IMREAD_COLOR)  # Giữ ảnh gốc không thay đổi
 
-if image is not None:
+if original_image is not None:
     # Xử lý ảnh
-    original, binary, dilated, dist_transform, img_markers, characters, char_images = process_image(image)
+    processed_image, binary, dilated, dist_transform, img_markers, characters, char_images = process_image(original_image.copy())
 
     # Hiển thị ảnh gốc
     st.subheader("Ảnh gốc")
-    st.image(cv.cvtColor(original, cv.COLOR_BGR2RGB))
+    st.image(cv.cvtColor(original_image, cv.COLOR_BGR2RGB))
+
+    # Hiển thị ảnh với bounding box
+    st.subheader("Ảnh với bounding box xung quanh các ký tự")
+    st.image(cv.cvtColor(processed_image, cv.COLOR_BGR2RGB))
 
     # Hiển thị các ký tự theo chiều ngang
     st.subheader("Các ký tự phát hiện được")
@@ -80,10 +84,6 @@ if image is not None:
     # Hiển thị ảnh với watershed markers
     st.subheader("Ảnh Watershed Segmentation")
     st.image(cv.cvtColor(img_markers, cv.COLOR_BGR2RGB))
-
-    # Hiển thị ảnh với bounding box xung quanh các ký tự
-    st.subheader("Ảnh với bounding box xung quanh các ký tự")
-    st.image(cv.cvtColor(original, cv.COLOR_BGR2RGB))
 
 else:
     st.error("Không thể tải ảnh từ URL.")
