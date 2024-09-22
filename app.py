@@ -1,21 +1,25 @@
 import streamlit as st
 import cv2 as cv
 import numpy as np
-import requests  # Thêm dòng này để import thư viện requests
-from character import process_image  # Import hàm từ tệp phân đoạn ký tự
+import requests
+from character_segmentation import process_image  # Import hàm từ tệp phân đoạn ký tự
 
 # Tiêu đề ứng dụng
 st.title("Ứng dụng Xử lý Hình ảnh")
 
 # Tải ảnh từ GitHub
-image_url = "https://github.com/Phuocbinh2003/opencv_app2/blob/main/ndata96.jpg"  # Cập nhật đường dẫn đúng
+image_url = "ndata96.jpg"  # Cập nhật đường dẫn đúng
 
 # Đọc ảnh từ URL
 image_response = requests.get(image_url)
-uploaded_file = image_response.content
+image_bytes = image_response.content
+
+# Chuyển bytes thành định dạng hình ảnh mà OpenCV có thể xử lý
+nparr = np.frombuffer(image_bytes, np.uint8)
+image = cv.imdecode(nparr, cv.IMREAD_COLOR)
 
 # Xử lý ảnh
-original, binary, dilated, dist_transform, img_markers = process_image(uploaded_file)
+original, binary, dilated, dist_transform, img_markers = process_image(image)
 
 # Hiển thị ảnh gốc
 st.subheader("Ảnh gốc")
