@@ -1,7 +1,8 @@
 import streamlit as st
 import cv2 as cv
 import numpy as np
-import requests
+from PIL import Image
+import matplotlib.pyplot as plt
 
 # Hàm xử lý hình ảnh
 def process_image(image):
@@ -50,61 +51,49 @@ def process_image(image):
 
     return image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, img_markers, characters, char_images
 
-# Xây dựng giao diện Streamlit
-st.title("Ứng dụng Xử lý Hình ảnh - Quy trình Watershed")
+# Xây dựng ứng dụng
+st.title('✨ License Plate Detection with Watershed Algorithm ')
 
-# Tải ảnh từ GitHub
-image_url = "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata96.jpg"
-image_response = requests.get(image_url)
-nparr = np.frombuffer(image_response.content, np.uint8)
-original_image = cv.imdecode(nparr, cv.IMREAD_COLOR)
+st.divider()
 
-if original_image is not None:
-    # Xử lý ảnh qua từng bước
-    processed_image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, img_markers, characters, char_images = process_image(original_image.copy())
+st.sidebar.write("## 📷 Upload Image")
+uploaded_file = st.sidebar.file_uploader("", type="jpg")
+if uploaded_file is not None:
+    img = Image.open(uploaded_file)
+    img_np = np.array(img)  # Convert PIL Image to NumPy array
+    st.image(img, caption='Uploaded Image.', use_column_width=True)
 
-    # Hiển thị ảnh gốc
-    st.subheader("1. Ảnh gốc")
-    st.image(cv.cvtColor(original_image, cv.COLOR_BGR2RGB))
+    # Thực hiện nhận diện biển số bằng Watershed
+    if st.button('Detect License Plate'):
+        processed_image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, img_markers, characters, char_images = process_image(img_np)
 
-    # Hiển thị ảnh nhị phân
-    st.subheader("2. Ảnh nhị phân")
-    st.image(binary, channels="GRAY")
+        st.write("### Processing")
 
-    # Hiển thị ảnh sau khi mở rộng (Dilation)
-    st.subheader("3. Ảnh sau khi mở rộng (Dilation)")
-    st.image(dilated, channels="GRAY")
+        fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(17, 17))
 
-    # Hiển thị Distance Transform
-    st.subheader("4. Distance Transform")
-    dist_transform_normalized = cv.normalize(dist_transform, None, 0, 1, cv.NORM_MINMAX)
-    st.image(dist_transform_normalized, channels="GRAY")
+        # Hiển thị các kết quả trung gian
+        axes[0, 0].imshow(cv.cvtColor(img_np, cv.COLOR_BGR2RGB))
+        axes[0, 0].set_title('Original Image')
+        axes[0, 1].imshow(binary, cmap='gray')
+        axes[0, 1].set_title('Binarization')
+        axes[0, 2].imshow(dilated, cmap='gray')
+        axes[0, 2].set_title('Dilated Image')
+        axes[1, 0].imshow(dist_transform, cmap='gray')
+        axes[1, 0].set_title('Distance Transform')
+        axes[1, 1].imshow(sure_fg, cmap='gray')
+        axes[1, 1].set_title('Sure Foreground')
+        axes[1, 2].imshow(sure_bg, cmap='gray')
+        axes[1, 2].set_title('Sure Background')
+        axes[2, 0].imshow(unknown, cmap='gray')
+        axes[2, 0].set_title('Unknown Region')
+        axes[2, 1].imshow(img_markers)
+        axes[2, 1].set_title('Markers')
 
-    # Hiển thị Sure Foreground
-    st.subheader("5. Sure Foreground")
-    st.image(sure_fg, channels="GRAY")
+        for ax in axes.flatten():
+            ax.axis('off')
 
-    # Hiển thị Sure Background
-    st.subheader("6. Sure Background")
-    st.image(sure_bg, channels="GRAY")
+        st.pyplot(fig)
 
-    # Hiển thị Unknown Region
-    st.subheader("7. Unknown Region")
-    st.image(unknown, channels="GRAY")
+        st.subheader("Watershed Segmentation Image")
+        st.image(processed_image, channels="BGR")
 
-    # Hiển thị ảnh sau khi áp dụng Watershed
-    st.subheader("8. Ảnh sau khi áp dụng Watershed Segmentation")
-    st.image(cv.cvtColor(img_markers, cv.COLOR_BGR2RGB))
-
-    # Hiển thị ký tự đã phát hiện
-    st.subheader("9. Các ký tự phát hiện được")
-    if char_images:
-        cols = st.columns(len(char_images))  # Tạo các cột tương ứng với số ký tự
-        for idx, char_img in enumerate(char_images):
-            with cols[idx]:
-                st.image(char_img, caption=f"Ký tự {idx + 1}", channels="GRAY")
-    else:
-        st.write("Không phát hiện được ký tự nào.")
-
-else:
-    st.error("Không thể tải ảnh từ URL.")
