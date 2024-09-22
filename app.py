@@ -8,7 +8,7 @@ import requests  # Make sure to include this import
 # Danh sách các URL hoặc đường dẫn tới các hình ảnh
 image_urls = [
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata349.jpg",
-    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata258.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata235.jpg",
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata397.jpg",
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata407.jpg",
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata360.jpg",
