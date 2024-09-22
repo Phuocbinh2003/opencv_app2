@@ -2,13 +2,13 @@ import streamlit as st
 import cv2 as cv
 import numpy as np
 import requests
-from character import process_image  # Import hàm từ tệp phân đoạn ký tự
+from character import process_image
 
 # Tiêu đề ứng dụng
 st.title("Ứng dụng Xử lý Hình ảnh")
 
 # Tải ảnh từ GitHub
-image_url = "https://github.com/Phuocbinh2003/opencv_app2/blob/main/ndata96.jpg"  # Cập nhật đường dẫn đúng
+image_url = "https://github.com/Phuocbinh2003/opencv_app2/blob/main/ndata96.jpg"  # Đường dẫn đúng
 
 # Đọc ảnh từ URL
 image_response = requests.get(image_url)
