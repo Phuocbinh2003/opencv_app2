@@ -3,6 +3,7 @@ import cv2 as cv
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+import requests  # Make sure to include this import
 
 # Danh sách các URL hoặc đường dẫn tới các hình ảnh
 image_urls = [
