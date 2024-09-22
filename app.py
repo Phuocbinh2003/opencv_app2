@@ -7,15 +7,15 @@ import requests  # Make sure to include this import
 
 # Danh sách các URL hoặc đường dẫn tới các hình ảnh
 image_urls = [
-    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata96.jpg",
-    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata393.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata349.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata258.jpg",
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata397.jpg",
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata407.jpg",
-    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata426.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata360.jpg",
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata470.jpg",
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata497.jpg",
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata592.jpg",
-    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata600.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata96.jpg",
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata89.jpg",
 ]
 
