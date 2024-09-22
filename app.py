@@ -56,7 +56,7 @@ def process_image(image):
     return image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, markers, characters, char_images, img_watershed, image_with_boxes
 
 # Xây dựng ứng dụng
-st.title('✨ License Plate Detection with Watershed Algorithm ')
+st.title('✨ Phân đoạn ký tự biển số ')
 
 st.divider()
 
