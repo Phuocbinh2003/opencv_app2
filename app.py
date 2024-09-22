@@ -1,42 +1,38 @@
 import streamlit as st
 import cv2 as cv
 import numpy as np
-import requests
-from character import process_image
+from character_segmentation import process_image
 
-# Tiêu đề ứng dụng
 st.title("Ứng dụng Xử lý Hình ảnh")
 
-# Tải ảnh từ GitHub
-image_url = "https://github.com/Phuocbinh2003/opencv_app2/blob/main/ndata96.jpg"  # Đường dẫn đúng
-
-# Đọc ảnh từ URL
+# Load image from GitHub
+image_url = "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata96.jpg"
 image_response = requests.get(image_url)
-image_bytes = image_response.content
-
-# Chuyển bytes thành định dạng hình ảnh mà OpenCV có thể xử lý
-nparr = np.frombuffer(image_bytes, np.uint8)
+nparr = np.frombuffer(image_response.content, np.uint8)
 image = cv.imdecode(nparr, cv.IMREAD_COLOR)
 
-# Xử lý ảnh
-original, binary, dilated, dist_transform, img_markers = process_image(image)
+if image is not None:
+    # Process image
+    original, binary, dilated, dist_transform, img_markers = process_image(image)
 
-# Hiển thị ảnh gốc
-st.subheader("Ảnh gốc")
-st.image(original, channels="BGR")
+    # Display original image
+    st.subheader("Ảnh gốc")
+    st.image(cv.cvtColor(original, cv.COLOR_BGR2RGB))
 
-# Hiển thị ảnh nhị phân
-st.subheader("Ảnh nhị phân")
-st.image(binary, use_column_width=True, clamp=True, channels="GRAY")
+    # Display binary image
+    st.subheader("Ảnh nhị phân")
+    st.image(binary, channels="GRAY")
 
-# Hiển thị ảnh sau khi mở rộng
-st.subheader("Ảnh sau khi mở rộng")
-st.image(dilated, use_column_width=True, clamp=True, channels="GRAY")
+    # Display dilated image
+    st.subheader("Ảnh sau khi mở rộng")
+    st.image(dilated, channels="GRAY")
 
-# Hiển thị Distance Transform
-st.subheader("Distance Transform")
-st.image(dist_transform, use_column_width=True, clamp=True, channels="GRAY")
+    # Display distance transform
+    st.subheader("Distance Transform")
+    st.image(dist_transform, channels="GRAY")
 
-# Hiển thị ảnh Watershed
-st.subheader("Ảnh Watershed Segmentation")
-st.image(img_markers, channels="BGR")
+    # Display watershed segmented image
+    st.subheader("Ảnh Watershed Segmentation")
+    st.image(cv.cvtColor(img_markers, cv.COLOR_BGR2RGB))
+else:
+    st.error("Không thể tải ảnh từ URL.")
