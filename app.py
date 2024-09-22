@@ -2,54 +2,46 @@ import streamlit as st
 import cv2 as cv
 import numpy as np
 import requests
-from matplotlib import pyplot as plt
 
 # Hàm xử lý hình ảnh
 def process_image(image):
-    # Chuyển đổi sang ảnh xám
     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-
-    # Áp dụng ngưỡng hóa Otsu
     _, binary = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)
-
-    # Mở rộng ảnh
     kernel = np.ones((3, 3), np.uint8)
     dilated = cv.dilate(binary, kernel, iterations=1)
-
-    # Khoảng cách transform
     dist_transform = cv.distanceTransform(dilated, cv.DIST_L2, 5)
     
-    # Ngưỡng hóa distance transform
     _, sure_fg = cv.threshold(dist_transform, 0.3 * dist_transform.max(), 255, 0)
     sure_fg = np.uint8(sure_fg)
-
-    # Tìm background chắc chắn
     sure_bg = cv.dilate(dilated, kernel, iterations=2)
-
-    # Vùng chưa biết
     unknown = cv.subtract(sure_bg, sure_fg)
-
-    # Tạo markers cho watershed
+    
     _, markers = cv.connectedComponents(sure_fg)
     markers = markers + 1
     markers[unknown == 255] = 0
-
-    # Áp dụng thuật toán Watershed
+    
     img_markers = image.copy()
     cv.watershed(img_markers, markers)
     img_markers[markers == -1] = [0, 0, 255]
 
-    # Tìm các contour
     contours, _ = cv.findContours(dilated, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
-    # Vẽ bounding box
+    # Danh sách ký tự
+    characters = []
     char_id = 1
     for contour in contours:
         x, y, w, h = cv.boundingRect(contour)
         if h > 7 and w > 7:  # Lọc những contour có kích thước phù hợp
             cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 1)
+            char_image = binary[y:y+h, x:x+w]  # Cắt từng ký tự
+            # Chuyển đổi ký tự thành ký tự ASCII (giả định là chữ cái)
+            char = '?'
+            if np.sum(char_image) > 0:  # Nếu có dấu hiệu của ký tự
+                char = "Ký tự " + str(char_id)  # Tạo tên cho ký tự
+                characters.append(char)
+                char_id += 1
 
-    return image, binary, dilated, dist_transform, img_markers
+    return image, binary, dilated, dist_transform, img_markers, characters
 
 st.title("Ứng dụng Xử lý Hình ảnh")
 
@@ -61,11 +53,16 @@ image = cv.imdecode(nparr, cv.IMREAD_COLOR)
 
 if image is not None:
     # Xử lý ảnh
-    original, binary, dilated, dist_transform, img_markers = process_image(image)
+    original, binary, dilated, dist_transform, img_markers, characters = process_image(image)
 
     # Hiển thị ảnh gốc
     st.subheader("Ảnh gốc")
     st.image(cv.cvtColor(original, cv.COLOR_BGR2RGB))
+
+    # Hiển thị các ký tự
+    st.subheader("Các ký tự phát hiện được")
+    for char in characters:
+        st.write(char)
 
     # Hiển thị ảnh nhị phân
     st.subheader("Ảnh nhị phân")
