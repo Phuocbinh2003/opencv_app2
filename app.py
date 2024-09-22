@@ -32,7 +32,7 @@ def process_image(image):
     char_id = 1
     for contour in contours:
         x, y, w, h = cv.boundingRect(contour)
-        if h > 10 and w > 10:  # Điều chỉnh kích thước tối thiểu
+        if h > 7 and w > 7 and h<15 and w<15:  # Điều chỉnh kích thước tối thiểu
             cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 1)
             char_image = binary[y:y+h, x:x+w]  # Cắt từng ký tự
             characters.append(f"Ký tự {char_id}")  # Tạo tên cho ký tự
