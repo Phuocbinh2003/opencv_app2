@@ -1,7 +1,7 @@
 import streamlit as st
 import cv2 as cv
 import numpy as np
-from character_segmentation import process_image
+from character import process_image
 
 st.title("Ứng dụng Xử lý Hình ảnh")
 
