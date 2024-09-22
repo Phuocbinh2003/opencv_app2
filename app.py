@@ -57,15 +57,12 @@ if image is not None:
     st.subheader("Ảnh gốc")
     st.image(cv.cvtColor(original, cv.COLOR_BGR2RGB))
 
-    # Hiển thị các ký tự
+    # Hiển thị các ký tự theo chiều ngang
     st.subheader("Các ký tự phát hiện được")
-    for char in characters:
-        st.write(char)
-
-    # Hiển thị ảnh ký tự
-    st.subheader("Ảnh các ký tự")
+    cols = st.columns(len(char_images))  # Tạo các cột tương ứng với số ký tự
     for idx, char_img in enumerate(char_images):
-        st.image(char_img, caption=f"Ký tự {idx + 1}", channels="GRAY")
+        with cols[idx]:
+            st.image(char_img, caption=f"Ký tự {idx + 1}", channels="GRAY")
 
     # Hiển thị ảnh nhị phân
     st.subheader("Ảnh nhị phân")
