@@ -8,7 +8,7 @@ from character import process_image  # Import hàm từ tệp phân đoạn ký 
 st.title("Ứng dụng Xử lý Hình ảnh")
 
 # Tải ảnh từ GitHub
-image_url = "https://raw.githubusercontent.com/username/repo_name/main/images/ndata96.jpg"  # Cập nhật đường dẫn đúng
+image_url = "https://github.com/Phuocbinh2003/opencv_app2/blob/main/ndata96.jpg"  # Cập nhật đường dẫn đúng
 
 # Đọc ảnh từ URL
 image_response = requests.get(image_url)
