@@ -27,13 +27,13 @@ def process_image(image):
 
     # Gán nhãn cho các markers
     _, markers = cv.connectedComponents(sure_fg)
-    markers = markers + 1
-    markers[unknown == 255] = 0
+    markers = markers + 1  # Thêm 1 để tránh gán nhãn cho background
+    markers[unknown == 255] = 0  # Đặt các vùng không xác định là 0
 
     # Áp dụng watershed
-    img_markers = image.copy()
-    cv.watershed(img_markers, markers)
-    img_markers[markers == -1] = [0, 0, 255]
+    img_watershed = image.copy()
+    cv.watershed(img_watershed, markers)
+    img_watershed[markers == -1] = [0, 0, 255]  # Đánh dấu biên giới với màu đỏ
 
     # Tìm contour và tách ký tự
     contours, _ = cv.findContours(dilated, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
@@ -53,7 +53,7 @@ def process_image(image):
             char_images.append(char_image)  
             char_id += 1
 
-    return image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, img_markers, characters, char_images, image_with_boxes
+    return image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, markers, characters, char_images, img_watershed, image_with_boxes
 
 # Xây dựng ứng dụng
 st.title('✨ License Plate Detection with Watershed Algorithm ')
@@ -69,7 +69,7 @@ if uploaded_file is not None:
 
     # Thực hiện nhận diện biển số bằng Watershed
     if st.button('Detect License Plate'):
-        processed_image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, img_markers, characters, char_images, image_with_boxes = process_image(img_np)
+        processed_image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, markers, characters, char_images, img_watershed, image_with_boxes = process_image(img_np)
 
         st.write("### Processing")
 
@@ -91,8 +91,8 @@ if uploaded_file is not None:
         axes[1, 2].set_title('Sure Background')
         axes[2, 0].imshow(unknown, cmap='gray')
         axes[2, 0].set_title('Unknown Region')
-        axes[2, 1].imshow(cv.cvtColor(img_markers, cv.COLOR_BGR2RGB))  # Sử dụng ảnh Watershed segmentation
-        axes[2, 1].set_title('Watershed Segmentation Markers')
+        axes[2, 1].imshow(cv.cvtColor(img_watershed, cv.COLOR_BGR2RGB))  # Sử dụng ảnh Watershed segmentation
+        axes[2, 1].set_title('Watershed Segmentation')
 
         for ax in axes.flatten():
             ax.axis('off')
