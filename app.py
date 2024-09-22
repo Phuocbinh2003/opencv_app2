@@ -3,12 +3,20 @@ import cv2 as cv
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-import requests
+import requests  # Make sure to include this import
 
 # Danh sách các URL hoặc đường dẫn tới các hình ảnh
 image_urls = [
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata96.jpg",
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata393.jpg",
-    # Add more image URLs here
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata397.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata407.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata426.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata470.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata497.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata592.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata600.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata89.jpg",
 ]
 
 # Hàm xử lý hình ảnh
@@ -61,24 +69,18 @@ nparr = np.frombuffer(image_response.content, np.uint8)
 img_np = cv.imdecode(nparr, cv.IMREAD_COLOR)
 
 if img_np is not None:
-    # Chỉnh kích thước ảnh
-    target_width = 800  # Thay đổi kích thước theo ý muốn
-    aspect_ratio = img_np.shape[0] / img_np.shape[1]
-    target_height = int(target_width * aspect_ratio)
-    img_resized = cv.resize(img_np, (target_width, target_height))
-
-    st.image(img_resized, caption='Selected Image.', use_column_width=True)
+    st.image(img_np, caption='Selected Image.', use_column_width=True)
 
     # Thực hiện nhận diện biển số bằng Watershed
     if st.button('Detect License Plate'):
-        processed_image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, markers, characters, char_images, img_watershed, image_with_boxes = process_image(img_resized)
+        processed_image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, markers, characters, char_images, img_watershed, image_with_boxes = process_image(img_np)
 
         st.write("### Processing")
 
         fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(17, 17))
 
         # Hiển thị các kết quả trung gian
-        axes[0, 0].imshow(cv.cvtColor(img_resized, cv.COLOR_BGR2RGB))
+        axes[0, 0].imshow(cv.cvtColor(img_np, cv.COLOR_BGR2RGB))
         axes[0, 0].set_title('Original Image')
         axes[0, 1].imshow(binary, cmap='gray')
         axes[0, 1].set_title('Binarization')
