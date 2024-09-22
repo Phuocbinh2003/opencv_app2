@@ -9,10 +9,11 @@ def process_image(image):
     _, binary = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)
     kernel = np.ones((3, 3), np.uint8)
     dilated = cv.dilate(binary, kernel, iterations=1)
-    dist_transform = cv.distanceTransform(dilated, cv.DIST_L2, 5)
     
+    dist_transform = cv.distanceTransform(dilated, cv.DIST_L2, 5)
     _, sure_fg = cv.threshold(dist_transform, 0.3 * dist_transform.max(), 255, 0)
     sure_fg = np.uint8(sure_fg)
+    
     sure_bg = cv.dilate(dilated, kernel, iterations=2)
     unknown = cv.subtract(sure_bg, sure_fg)
     
@@ -26,22 +27,19 @@ def process_image(image):
 
     contours, _ = cv.findContours(dilated, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
-    # Danh sách ký tự
     characters = []
+    char_images = []  # Danh sách ảnh ký tự
     char_id = 1
     for contour in contours:
         x, y, w, h = cv.boundingRect(contour)
-        if h > 7 and w > 7:  # Lọc những contour có kích thước phù hợp
+        if h > 10 and w > 10:  # Điều chỉnh kích thước tối thiểu
             cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 1)
             char_image = binary[y:y+h, x:x+w]  # Cắt từng ký tự
-            # Chuyển đổi ký tự thành ký tự ASCII (giả định là chữ cái)
-            char = '?'
-            if np.sum(char_image) > 0:  # Nếu có dấu hiệu của ký tự
-                char = "Ký tự " + str(char_id)  # Tạo tên cho ký tự
-                characters.append(char)
-                char_id += 1
+            characters.append(f"Ký tự {char_id}")  # Tạo tên cho ký tự
+            char_images.append(char_image)  # Lưu ảnh ký tự
+            char_id += 1
 
-    return image, binary, dilated, dist_transform, img_markers, characters
+    return image, binary, dilated, dist_transform, img_markers, characters, char_images
 
 st.title("Ứng dụng Xử lý Hình ảnh")
 
@@ -53,7 +51,7 @@ image = cv.imdecode(nparr, cv.IMREAD_COLOR)
 
 if image is not None:
     # Xử lý ảnh
-    original, binary, dilated, dist_transform, img_markers, characters = process_image(image)
+    original, binary, dilated, dist_transform, img_markers, characters, char_images = process_image(image)
 
     # Hiển thị ảnh gốc
     st.subheader("Ảnh gốc")
@@ -63,6 +61,11 @@ if image is not None:
     st.subheader("Các ký tự phát hiện được")
     for char in characters:
         st.write(char)
+
+    # Hiển thị ảnh ký tự
+    st.subheader("Ảnh các ký tự")
+    for idx, char_img in enumerate(char_images):
+        st.image(char_img, caption=f"Ký tự {idx + 1}", channels="GRAY")
 
     # Hiển thị ảnh nhị phân
     st.subheader("Ảnh nhị phân")
