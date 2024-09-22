@@ -7,7 +7,7 @@ import requests
 def process_image(image):
     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
     _, binary = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)
-    kernel = np.ones((3, 3), np.uint8)
+    kernel = np.ones((2, 2), np.uint8)
     dilated = cv.dilate(binary, kernel, iterations=1)
     
     dist_transform = cv.distanceTransform(dilated, cv.DIST_L2, 5)
