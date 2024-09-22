@@ -1,8 +1,8 @@
 import streamlit as st
 import cv2 as cv
-import requests  # Import the requests library
 import numpy as np
-from character import process_image
+import requests  # Import the requests library
+from character_segmentation import process_image
 
 st.title("Ứng dụng Xử lý Hình ảnh")
 
@@ -28,9 +28,10 @@ if image is not None:
     st.subheader("Ảnh sau khi mở rộng")
     st.image(dilated, channels="GRAY")
 
-    # Display distance transform
+    # Normalize and display distance transform
     st.subheader("Distance Transform")
-    st.image(dist_transform, channels="GRAY")
+    dist_transform_normalized = cv.normalize(dist_transform, None, 0, 1, cv.NORM_MINMAX)
+    st.image(dist_transform_normalized, channels="GRAY")
 
     # Display watershed segmented image
     st.subheader("Ảnh Watershed Segmentation")
