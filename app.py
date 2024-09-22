@@ -64,13 +64,16 @@ if uploaded_file is not None:
     st.image(img, caption='Uploaded Image.', use_column_width=True)
 
     # Thực hiện nhận diện biển số bằng Watershed
+    # Thực hiện nhận diện biển số bằng Watershed
     if st.button('Detect License Plate'):
+        # Gọi hàm xử lý và nhận các kết quả
         processed_image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, img_markers, characters, char_images = process_image(img_np)
-
+    
         st.write("### Processing")
-
+    
+        # Hiển thị các kết quả trung gian bằng matplotlib
         fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(17, 17))
-
+    
         # Hiển thị các kết quả trung gian
         axes[0, 0].imshow(cv.cvtColor(img_np, cv.COLOR_BGR2RGB))
         axes[0, 0].set_title('Original Image')
@@ -86,21 +89,23 @@ if uploaded_file is not None:
         axes[1, 2].set_title('Sure Background')
         axes[2, 0].imshow(unknown, cmap='gray')
         axes[2, 0].set_title('Unknown Region')
-        axes[2, 1].imshow(img_markers)
-        axes[2, 1].set_title('Markers')
-
+        axes[2, 1].imshow(cv.cvtColor(img_markers, cv.COLOR_BGR2RGB))  # Sử dụng ảnh Watershed segmentation
+        axes[2, 1].set_title('Watershed Segmentation Markers')
+    
         for ax in axes.flatten():
             ax.axis('off')
-
+    
+        # Hiển thị hình ảnh với các bước trung gian
         st.pyplot(fig)
+    
         # Hiển thị các ký tự phát hiện được
         st.subheader("Các ký tự phát hiện được")
         cols = st.columns(len(char_images))  # Tạo các cột dựa trên số ký tự phát hiện được
         for idx, char_img in enumerate(char_images):
             with cols[idx]:
                 st.image(char_img, caption=f"Ký tự {idx + 1}", channels="GRAY")
-
-
-        st.subheader("Watershed Segmentation Image")
+    
+        # Hiển thị ảnh đã vẽ bounding boxes xung quanh các ký tự
+        st.subheader("Processed Image with Bounding Boxes")
         st.image(processed_image, channels="BGR")
 
