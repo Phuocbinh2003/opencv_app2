@@ -8,15 +8,15 @@ import requests  # Make sure to include this import
 # Danh sách các URL hoặc đường dẫn tới các hình ảnh
 image_urls = [
     "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata96.jpg",
-    "https://example.com/image2.jpg",
-    "https://example.com/image3.jpg",
-    "https://example.com/image4.jpg",
-    "https://example.com/image5.jpg",
-    "https://example.com/image6.jpg",
-    "https://example.com/image7.jpg",
-    "https://example.com/image8.jpg",
-    "https://example.com/image9.jpg",
-    "https://example.com/image10.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata393.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata397.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata407.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata426.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata470.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata497.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata592.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata600.jpg",
+    "https://github.com/Phuocbinh2003/opencv_app2/raw/main/ndata89.jpg",
 ]
 
 # Hàm xử lý hình ảnh
