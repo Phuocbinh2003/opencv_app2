@@ -1,5 +1,6 @@
 import streamlit as st
 import cv2 as cv
+import requests  # Import the requests library
 import numpy as np
 from character import process_image
 
