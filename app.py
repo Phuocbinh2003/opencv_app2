@@ -40,16 +40,20 @@ def process_image(image):
     characters = []
     char_images = []
     char_id = 1
+
+    # Tạo bản sao của ảnh gốc để vẽ bounding boxes
+    image_with_boxes = image.copy()
+
     for contour in contours:
         x, y, w, h = cv.boundingRect(contour)
         if h > 7 and w > 7 and h < 100 and w < 100:  # Điều chỉnh kích thước tối thiểu
-            cv.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 1) 
+            cv.rectangle(image_with_boxes, (x, y), (x + w, y + h), (0, 255, 0), 1) 
             char_image = binary[y:y+h, x:x+w]  
             characters.append(f"Ký tự {char_id}") 
             char_images.append(char_image)  
             char_id += 1
 
-    return image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, img_markers, characters, char_images
+    return image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, img_markers, characters, char_images, image_with_boxes
 
 # Xây dựng ứng dụng
 st.title('✨ License Plate Detection with Watershed Algorithm ')
@@ -64,16 +68,14 @@ if uploaded_file is not None:
     st.image(img, caption='Uploaded Image.', use_column_width=True)
 
     # Thực hiện nhận diện biển số bằng Watershed
-    # Thực hiện nhận diện biển số bằng Watershed
     if st.button('Detect License Plate'):
-        # Gọi hàm xử lý và nhận các kết quả
-        processed_image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, img_markers, characters, char_images = process_image(img_np)
-    
+        processed_image, binary, dilated, dist_transform, sure_fg, sure_bg, unknown, img_markers, characters, char_images, image_with_boxes = process_image(img_np)
+
         st.write("### Processing")
-    
+
         # Hiển thị các kết quả trung gian bằng matplotlib
         fig, axes = plt.subplots(nrows=3, ncols=3, figsize=(17, 17))
-    
+
         # Hiển thị các kết quả trung gian
         axes[0, 0].imshow(cv.cvtColor(img_np, cv.COLOR_BGR2RGB))
         axes[0, 0].set_title('Original Image')
@@ -91,21 +93,19 @@ if uploaded_file is not None:
         axes[2, 0].set_title('Unknown Region')
         axes[2, 1].imshow(cv.cvtColor(img_markers, cv.COLOR_BGR2RGB))  # Sử dụng ảnh Watershed segmentation
         axes[2, 1].set_title('Watershed Segmentation Markers')
-    
+
         for ax in axes.flatten():
             ax.axis('off')
-    
-        # Hiển thị hình ảnh với các bước trung gian
+
         st.pyplot(fig)
-    
+
         # Hiển thị các ký tự phát hiện được
         st.subheader("Các ký tự phát hiện được")
         cols = st.columns(len(char_images))  # Tạo các cột dựa trên số ký tự phát hiện được
         for idx, char_img in enumerate(char_images):
             with cols[idx]:
                 st.image(char_img, caption=f"Ký tự {idx + 1}", channels="GRAY")
-    
+
         # Hiển thị ảnh đã vẽ bounding boxes xung quanh các ký tự
         st.subheader("Processed Image with Bounding Boxes")
-        st.image(processed_image, channels="BGR")
-
+        st.image(image_with_boxes, channels="BGR")
