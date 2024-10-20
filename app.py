@@ -1,43 +1,43 @@
+import cv2
+import numpy as np
+from superpoint.datasets.synthetic_shapes import SyntheticShapes
+from utils import plot_imgs
 import streamlit as st
+from PIL import Image
 
-# Khởi tạo session state cho tọa độ chuột
-if 'mouse_x' not in st.session_state:
-    st.session_state.mouse_x = 0
-if 'mouse_y' not in st.session_state:
-    st.session_state.mouse_y = 0
+# Cấu hình dữ liệu
+config = {
+    'primitives': 'all',
+    'on-the-fly': True,
+    'preprocessing': {'resize': [120, 160], 'blur_size': 21}
+}
+dataset = SyntheticShapes(**config)
+data = dataset.get_test_set()
 
-# Tạo một placeholder để hiển thị vị trí chuột
-mouse_pos_placeholder = st.empty()
+# Hàm vẽ keypoint
+def draw_keypoints(img, corners, color):
+    keypoints = [cv2.KeyPoint(c[1], c[0], 1) for c in np.stack(corners).T]
+    return cv2.drawKeypoints(img.astype(np.uint8), keypoints, None, color=color)
 
-# JavaScript để theo dõi vị trí chuột
-st.markdown("""
-    <script>
-    function updateMousePosition(event) {
-        const x = event.clientX;
-        const y = event.clientY;
-        
-        // Gửi vị trí chuột về Streamlit
-        const data = {x: x, y: y};
-        window.parent.streamlit.setMousePosition(data);
-    }
+# Hàm hiển thị ảnh
+def display(d):
+    return draw_keypoints(d['image'][..., 0] * 255, np.where(d['keypoint_map']), (0, 255, 0))
 
-    document.addEventListener('mousemove', updateMousePosition);
-    </script>
-""", unsafe_allow_html=True)
+# Tạo ứng dụng Streamlit
+st.title("SuperPoint Keypoint Visualization")
 
-# Hàm cập nhật vị trí chuột
-def update_mouse_position():
-    st.session_state.mouse_x = st.session_state.mouse_position['x']
-    st.session_state.mouse_y = st.session_state.mouse_position['y']
-    mouse_pos_placeholder.write(f"Vị trí chuột: (X: {st.session_state.mouse_x}, Y: {st.session_state.mouse_y})")
+# Hiển thị ảnh
+for i in range(8):
+    st.subheader(f"Set {i+1}")
+    col1, col2, col3, col4 = st.columns(4)  # Tạo 4 cột để hiển thị 4 ảnh
 
-# Thiết lập hàm callback để gọi khi có sự thay đổi
-if 'mouse_position' not in st.session_state:
-    st.session_state.mouse_position = {'x': 0, 'y': 0}
+    for col in [col1, col2, col3, col4]:
+        d = next(data)
+        img = display(d)
 
-# Nút để lấy vị trí chuột
-if st.button('Lấy vị trí chuột'):
-    update_mouse_position()
+        # Chuyển đổi ảnh từ định dạng OpenCV (BGR) sang định dạng PIL (RGB)
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        pil_img = Image.fromarray(img_rgb)
 
-# Hiển thị vị trí chuột ban đầu
-mouse_pos_placeholder.write(f"Vị trí chuột: (X: {st.session_state.mouse_x}, Y: {st.session_state.mouse_y})")
+        # Hiển thị ảnh trong cột
+        col.image(pil_img, use_column_width=True)
